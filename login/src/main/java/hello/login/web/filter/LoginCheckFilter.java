@@ -28,8 +28,6 @@ public class LoginCheckFilter implements Filter {
 
         HttpServletResponse httpResponse = (HttpServletResponse) response;
 
-        chain.doFilter(request, response);
-
         try {
             log.info("인증 체크 필터 시작{}", requestURI);
 
@@ -43,8 +41,12 @@ public class LoginCheckFilter implements Filter {
                     return;
                 }
             }
+
+            chain.doFilter(request, response);
         } catch (Exception e) {
-            //TODO: handle exception
+            throw e;
+        } finally {
+            log.info("인증 체크 필터 종료{}", requestURI);
         }
         
     }
@@ -53,6 +55,6 @@ public class LoginCheckFilter implements Filter {
      * 화이트 리스트의 경우 인증 체크X
      */
     private boolean isLoginCheckPath(String requestURI) {
-        return PatternMatchUtils.simpleMatch(whiteList, requestURI);
+        return !PatternMatchUtils.simpleMatch(whiteList, requestURI);
     }
 }
